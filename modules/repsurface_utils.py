@@ -104,9 +104,7 @@ def resort_points(points, idx):
     repeat_shape = [B, 1, G]
     n_indices = torch.arange(N, dtype=torch.long).to(device).view(view_shape).repeat(repeat_shape)
 
-    new_points = points[b_indices, n_indices, idx, :]
-
-    return new_points
+    return points[b_indices, n_indices, idx, :]
 
 
 def group_by_umbrella(xyz, new_xyz, k=9, cuda=False):
@@ -127,9 +125,9 @@ def group_by_umbrella(xyz, new_xyz, k=9, cuda=False):
     sorted_group_xyz = resort_points(group_xyz_norm, sort_idx).unsqueeze(-2)
     sorted_group_xyz_roll = torch.roll(sorted_group_xyz, -1, dims=-3)
     group_centriod = torch.zeros_like(sorted_group_xyz)
-    umbrella_group_xyz = torch.cat([group_centriod, sorted_group_xyz, sorted_group_xyz_roll], dim=-2)
-
-    return umbrella_group_xyz
+    return torch.cat(
+        [group_centriod, sorted_group_xyz, sorted_group_xyz_roll], dim=-2
+    )
 
 
 class SurfaceAbstraction(nn.Module):

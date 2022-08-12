@@ -11,7 +11,7 @@ from modules.repsurface_utils import SurfaceAbstractionCD, UmbrellaSurfaceConstr
 class Model(nn.Module):
     def __init__(self, args):
         super(Model, self).__init__()
-        center_channel = 0 if not args.return_center else (6 if args.return_polar else 3)
+        center_channel = (6 if args.return_polar else 3) if args.return_center else 0
         repsurf_channel = 10
 
         self.init_nsample = args.num_point

@@ -27,8 +27,7 @@ def xyz2sphere(xyz, normalize=True):
     if normalize:
         theta = theta / np.pi  # [0, 1]
         phi = phi / (2 * np.pi) + .5  # [0, 1]
-    out = torch.cat([rho, theta, phi], dim=-1)
-    return out
+    return torch.cat([rho, theta, phi], dim=-1)
 
 
 def xyz2cylind(xyz, normalize=True):
@@ -50,5 +49,4 @@ def xyz2cylind(xyz, normalize=True):
     if normalize:
         phi = phi / (2 * np.pi) + .5
         z = (z + 1.) / 2.
-    out = torch.cat([rho, phi, z], dim=-1)
-    return out
+    return torch.cat([rho, phi, z], dim=-1)

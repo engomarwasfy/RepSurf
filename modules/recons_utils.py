@@ -41,20 +41,23 @@ def cal_normal(group_xyz, random_inv=False, is_group=False):
 
     nor = torch.cross(edge_vec1, edge_vec2, dim=-1)
     unit_nor = nor / torch.norm(nor, dim=-1, keepdim=True)  # [B, N, 3] / [B, N, G, 3]
-    if not is_group:
-        pos_mask = (unit_nor[..., 0] > 0).float() * 2. - 1.  # keep x_n positive
-    else:
-        pos_mask = (unit_nor[..., 0:1, 0] > 0).float() * 2. - 1.
+    pos_mask = (
+        (unit_nor[..., 0:1, 0] > 0).float() * 2.0 - 1.0
+        if is_group
+        else (unit_nor[..., 0] > 0).float() * 2.0 - 1.0
+    )
+
     unit_nor = unit_nor * pos_mask.unsqueeze(-1)
 
     # batch-wise random inverse normal vector (prob: 0.5)
     if random_inv:
         random_mask = torch.randint(0, 2, (group_xyz.size(0), 1, 1)).float() * 2. - 1.
         random_mask = random_mask.to(unit_nor.device)
-        if not is_group:
-            unit_nor = unit_nor * random_mask
-        else:
-            unit_nor = unit_nor * random_mask.unsqueeze(-1)
+        unit_nor = (
+            unit_nor * random_mask.unsqueeze(-1)
+            if is_group
+            else unit_nor * random_mask
+        )
 
     return unit_nor
 
@@ -88,8 +91,7 @@ def cal_center(group_xyz):
     :param group_xyz: [B, N, K, 3] / [B, N, G, K, 3]; K >= 3
     :return: [B, N, 3] / [B, N, G, 3]
     """
-    center = torch.mean(group_xyz, dim=-2)
-    return center
+    return torch.mean(group_xyz, dim=-2)
 
 
 def cal_area(group_xyz):
@@ -103,8 +105,7 @@ def cal_area(group_xyz):
     det_xy = torch.det(torch.cat([group_xyz[..., 0, None], group_xyz[..., 1, None], torch.ones(pad_shape)], dim=-1))
     det_yz = torch.det(torch.cat([group_xyz[..., 1, None], group_xyz[..., 2, None], torch.ones(pad_shape)], dim=-1))
     det_zx = torch.det(torch.cat([group_xyz[..., 2, None], group_xyz[..., 0, None], torch.ones(pad_shape)], dim=-1))
-    area = torch.sqrt(det_xy ** 2 + det_yz ** 2 + det_zx ** 2).unsqueeze(-1)
-    return area
+    return torch.sqrt(det_xy ** 2 + det_yz ** 2 + det_zx ** 2).unsqueeze(-1)
 
 
 def cal_const(normal, center, is_normalize=True):
