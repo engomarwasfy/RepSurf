@@ -66,8 +66,7 @@ def index_points(points, idx, cuda=False, is_group=False):
     repeat_shape = list(idx.shape)
     repeat_shape[0] = 1
     batch_indices = torch.arange(B, dtype=torch.long).to(device).view(view_shape).repeat(repeat_shape)
-    new_points = points[batch_indices, idx, :]
-    return new_points
+    return points[batch_indices, idx, :]
 
 
 def farthest_point_sample(xyz, npoint, cuda=False):
@@ -133,8 +132,7 @@ def query_knn_point(k, xyz, new_xyz, cuda=False):
             new_xyz = new_xyz.contiguous()
         return knnquery(k, xyz, new_xyz)
     dist = square_distance(new_xyz, xyz)
-    group_idx = dist.sort(descending=False, dim=-1)[1][:, :, :k]
-    return group_idx
+    return dist.sort(descending=False, dim=-1)[1][:, :, :k]
 
 
 def sample(nsample, feature, cuda=False):

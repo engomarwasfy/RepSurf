@@ -47,9 +47,7 @@ class ClsLoss(nn.Module):
         super(ClsLoss, self).__init__()
 
     def forward(self, pred, target):
-        total_loss = F.nll_loss(pred, target)
-
-        return total_loss
+        return F.nll_loss(pred, target)
 
 
 class SmoothClsLoss(nn.Module):
@@ -63,14 +61,11 @@ class SmoothClsLoss(nn.Module):
 
         one_hot = torch.zeros_like(pred).scatter(1, target.view(-1, 1), 1)
         one_hot = one_hot * (1 - eps) + (1 - one_hot) * eps / (n_class - 1)
-        # log_prb = F.log_softmax(pred, dim=1)
-
-        loss = -(one_hot * pred).sum(dim=1).mean()
-        return loss
+        return -(one_hot * pred).sum(dim=1).mean()
 
 
 def get_model(args):
-    module = importlib.import_module('models.%s' % args.model)
+    module = importlib.import_module(f'models.{args.model}')
     return module.Model(args)
 
 

@@ -13,8 +13,7 @@ import torch
 def get_aug_args(args):
     dataset = args.dataset
     if dataset == 'ScanObjectNN':
-        aug_args = {'scale_factor': 0.5, 'shift_factor': 0.3}
-        return aug_args
+        return {'scale_factor': 0.5, 'shift_factor': 0.3}
     else:
         raise Exception('No such dataset')
 
@@ -25,9 +24,7 @@ def transform_point_cloud(batch, args, aug_args, train=True, label=None):
         batch[:, 0:3] = scale_point_cloud(batch[:, 0:3], aug_args['scale_factor'])
     if args.aug_shift:
         batch[:, 0:3] = shift_point_cloud(batch[:, 0:3], shift_range=aug_args['shift_factor'])
-    if label is not None:
-        return batch, label
-    return batch
+    return (batch, label) if label is not None else batch
 
 
 #################

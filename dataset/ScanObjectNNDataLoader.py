@@ -14,7 +14,7 @@ class ScanObjectNNDataLoader(Dataset):
     def __init__(self, root, split='training', bg=True):
         self.root = root
 
-        assert (split == 'training' or split == 'test')
+        assert split in ['training', 'test']
         if bg:
             print('Use data with background points')
             dir_name = 'main_split'
@@ -22,7 +22,7 @@ class ScanObjectNNDataLoader(Dataset):
             print('Use data without background points')
             dir_name = 'main_split_nobg'
         file_name = '_objectdataset_augmentedrot_scale75.h5'
-        h5_name = '{}/{}/{}'.format(self.root, dir_name, split + file_name)
+        h5_name = f'{self.root}/{dir_name}/{split + file_name}'
         with h5py.File(h5_name, mode="r") as f:
             self.data = f['data'][:].astype('float32')
             self.label = f['label'][:].astype('int64')

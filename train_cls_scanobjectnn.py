@@ -73,7 +73,7 @@ def test(model, loader, num_class=15, num_point=1024, num_votes=10, total_num=1)
     sing_correct = 0
     classifier = model.eval()
 
-    for j, data in enumerate(loader):
+    for data in loader:
         points, target = data
         points, target = points.cuda(), target.cuda()
 
@@ -139,7 +139,7 @@ def main(args):
     logger = logging.getLogger("Model")
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler = logging.FileHandler('%s/%s.txt' % (log_dir, args.model))
+    file_handler = logging.FileHandler(f'{log_dir}/{args.model}.txt')
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
@@ -165,7 +165,7 @@ def main(args):
     criterion = get_loss().cuda()
 
     try:
-        checkpoint = torch.load(str(experiment_dir) + '/checkpoints/best_model.pth')
+        checkpoint = torch.load(f'{str(experiment_dir)}/checkpoints/best_model.pth')
         start_epoch = checkpoint['epoch']
         classifier.load_state_dict(checkpoint['model_state_dict'])
         log_string('Use pretrain model')
@@ -261,8 +261,8 @@ def main(args):
 
                 if vote_acc >= best_vote_acc:
                     logger.info('Save model...')
-                    savepath = str(checkpoints_dir) + '/best_model.pth'
-                    log_string('Saving at %s' % savepath)
+                    savepath = f'{str(checkpoints_dir)}/best_model.pth'
+                    log_string(f'Saving at {savepath}')
                     state = {
                         'epoch': best_epoch,
                         'vote_acc': vote_acc,
